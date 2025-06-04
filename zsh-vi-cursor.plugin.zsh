@@ -1,0 +1,40 @@
+# : ${INSERT_SHAPE:=6}
+# : ${NORMAL_SHAPE:=2}
+# : ${VISUAL_SHAPE:=2}
+
+# : ${INSERT_COLOR:="#afd700"}
+# : ${NORMAL_COLOR:="#ff5f5f"}
+# : ${VISUAL_COLOR:="#ffd700"}
+
+bindkey -v
+
+KEYTIMEOUT=5
+
+# _color_cursor() { printf '\e]12;%s\a' "$1"; }
+_shape_cursor() { printf '\e[%d q' "$1"; }
+
+typeset -g _last_cursor_mode=''
+
+function _refresh_cursor {
+  [[ $KEYMAP == $_last_cursor_mode ]] && return
+  _last_cursor_mode=$KEYMAP
+
+  if [[ ${KEYMAP} == vicmd ]] ||
+     [[ $1 = 'block' ]]; then
+    echo -ne '\e[1 q'
+
+  elif [[ ${KEYMAP} == main ]] ||
+       [[ ${KEYMAP} == viins ]] ||
+       [[ ${KEYMAP} = '' ]] ||
+       [[ $1 = 'beam' ]]; then
+    echo -ne '\e[5 q'
+  fi
+}
+
+zle -N zle-keymap-select _refresh_cursor
+
+_fix_cursor() {
+   echo -ne '\e[5 q'
+}
+
+precmd_functions+=(_fix_cursor)
