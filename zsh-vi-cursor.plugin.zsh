@@ -6,18 +6,15 @@
 # : ${NORMAL_COLOR:="#ff5f5f"}
 # : ${VISUAL_COLOR:="#ffd700"}
 
+# _color_cursor() { printf '\e]12;%s\a' "$1"; }
+
 bindkey -v
 
 KEYTIMEOUT=5
 
-# _color_cursor() { printf '\e]12;%s\a' "$1"; }
 _shape_cursor() { printf '\e[%d q' "$1"; }
 
-typeset -g _last_cursor_mode=''
-
 function _refresh_cursor {
-  [[ $KEYMAP == $_last_cursor_mode ]] && return
-  _last_cursor_mode=$KEYMAP
 
   if [[ ${KEYMAP} == vicmd ]] ||
      [[ $1 = 'block' ]]; then
@@ -38,3 +35,6 @@ _fix_cursor() {
 }
 
 precmd_functions+=(_fix_cursor)
+
+_cursor_block_preexec() { printf '\e[1 q'; }
+preexec_functions+=(_cursor_block_preexec)
